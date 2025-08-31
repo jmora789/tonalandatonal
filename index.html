@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harmonic Mixer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300&family=Oswald:wght@400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Barlow', sans-serif;
+            font-size: 14pt;
+            color: #000000;
+            -webkit-user-select: none;  /* Safari */
+            -moz-user-select: none;    /* Firefox */
+            -ms-user-select: none;      /* IE10+/Edge */
+            user-select: none;          /* Standard */
+        }
+        .drop-area {
+            border: 2px dashed #a0aec0;
+            transition: all 0.2s;
+        }
+        .drop-area.active {
+            border-color: #48bb78;
+        }
+        .sound-icon {
+            cursor: grab;
+            transition: transform 0.2s, box-shadow 0.2s;
+            touch-action: none;
+        }
+        .sound-icon:active {
+            cursor: grabbing;
+        }
+        /* New styles for dropped buttons */
+        .sound-icon-in-slot {
+            font-weight: bold;
+            color: black;
+            font-size: 0.75rem; /* Match text-xs from Tailwind */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 flex flex-col items-center justify-center min-h-screen p-4">
+
+    <main class="w-full max-w-4xl p-8 bg-white rounded-2xl shadow-xl flex flex-col md:flex-row items-center justify-between space-y-8 md:space-y-0 md:space-x-8">
+        
+        <!-- Instruction Panel -->
+        <div class="md:w-1/3 w-full space-y-4">
+            <h1 class="text-xl font-bold text-center md:text-left" style="font-family: Arial, sans-serif; color: #e91d63;">The Harmonic Mixer</h1>
+            <p class="text-center md:text-left">
+                Drag a sound icon from the palettes and drop it into an available slot in the central mixer. Listen to how they interact and learn the difference between **tonal** and **atonal** music.
+            </p>
+            <div id="info-panel" class="text-black p-4 rounded-xl text-sm" style="background-color: #e1f8f3;">
+                <p><strong>Get started:</strong> Drag a sound icon from the palettes and drop it into the mixer to begin.</p>
+                <p class="mt-2"><strong>Tonal Music:</strong> Has a clear home key and a sense of resolution.</p>
+                <p><strong>Atonal Music:</strong> Avoids a key, creating a sense of tension or unpredictability.</p>
+            </div>
+            <button id="reset-button" class="w-full py-2 px-4 rounded-lg text-white font-semibold text-sm transform hover:scale-105 transition-transform duration-200" style="background-color: #e91d63;">
+                Reset Mixer
+            </button>
+        </div>
+
+        <!-- Central Mixer -->
+        <div id="mixer" class="md:w-1/3 w-full flex items-center justify-center">
+            <div class="w-64 h-64 rounded-full flex flex-wrap items-center justify-center gap-2 bg-gray-100 p-4">
+                <div id="slot-1" class="drop-area w-24 h-24 rounded-full flex items-center justify-center"></div>
+                <div id="slot-2" class="drop-area w-24 h-24 rounded-full flex items-center justify-center"></div>
+                <div id="slot-3" class="drop-area w-24 h-24 rounded-full flex items-center justify-center"></div>
+                <div id="slot-4" class="drop-area w-24 h-24 rounded-full flex items-center justify-center"></div>
+            </div>
+        </div>
+
+        <!-- Sound Palettes -->
+        <div class="md:w-1/3 w-full flex flex-row md:flex-col items-center justify-between md:space-y-6">
+            
+            <!-- Tonal Palette -->
+            <div class="flex-1 w-full flex flex-col items-center space-y-4">
+                <h2 class="font-bold text-sm text-center text-black uppercase" style="font-family: 'Oswald', sans-serif;">Tonal Sounds</h2>
+                <div class="flex flex-col space-y-4">
+                    <div id="tonal-arpeggio" class="sound-icon w-20 h-20 rounded-full flex items-center justify-center shadow-lg text-white font-semibold text-xs transform hover:scale-105 transition-transform duration-200" style="background-color: #1de9c1;" draggable="true" data-sound-id="tonal-arpeggio">
+                        Arpeggio
+                    </div>
+                    <div id="tonal-melody" class="sound-icon w-20 h-20 rounded-full flex items-center justify-center shadow-lg text-white font-semibold text-xs transform hover:scale-105 transition-transform duration-200" style="background-color: #1de9c1;" draggable="true" data-sound-id="tonal-melody">
+                        Melody
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Atonal Palette -->
+            <div class="flex-1 w-full flex flex-col items-center space-y-4 md:mt-0">
+                <h2 class="font-bold text-sm text-center text-black uppercase" style="font-family: 'Oswald', sans-serif;">Atonal Sounds</h2>
+                <div class="flex flex-col space-y-4">
+                    <div id="atonal-cluster" class="sound-icon w-20 h-20 rounded-full flex items-center justify-center shadow-lg text-white font-semibold text-xs transform hover:scale-105 transition-transform duration-200" style="background-color: #e91d63;" draggable="true" data-sound-id="atonal-cluster">
+                        Cluster
+                    </div>
+                    <div id="atonal-chromatic" class="sound-icon w-20 h-20 rounded-full flex items-center justify-center shadow-lg text-white font-semibold text-xs transform hover:scale-105 transition-transform duration-200" style="background-color: #e91d63;" draggable="true" data-sound-id="atonal-chromatic">
+                        Chromatic
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dropSlots = document.querySelectorAll('.drop-area');
+            const soundIcons = document.querySelectorAll('.sound-icon');
+            const infoPanel = document.getElementById('info-panel');
+            const resetButton = document.getElementById('reset-button');
+            const activeSounds = {};
+            let occupiedSlots = new Set();
+            let sounds = {}; // The sounds object will be re-created on reset.
+
+            const initialInfoContent = `
+                <p><strong>Get started:</strong> Drag a sound icon from the palettes and drop it into the mixer to begin.</p>
+                <p class="mt-2"><strong>Tonal Music:</strong> Has a clear home key and a sense of resolution.</p>
+                <p><strong>Atonal Music:</strong> Avoids a key, creating a sense of tension or unpredictability.</p>
+            `;
+            
+            // Initialize Tone.js instruments and a main volume control
+            const masterGain = new Tone.Gain(0.5).toDestination();
+            const tonalSynth = new Tone.Synth().connect(masterGain);
+            const atonalSynth = new Tone.Synth().connect(masterGain);
+            const arpeggioSynth = new Tone.PolySynth(Tone.Synth).connect(masterGain);
+            
+            // Function to define and re-initialize sounds
+            function initializeSounds() {
+                sounds = {
+                    'tonal-arpeggio': {
+                        player: new Tone.Part((time, note) => {
+                            arpeggioSynth.triggerAttackRelease(note, "8n", time);
+                        }, [
+                            ["0", "C4"], ["0.2", "E4"], ["0.4", "G4"], ["0.6", "A4"], ["0.8", "G4"], ["1.0", "E4"]
+                        ]),
+                        label: "Tonal Arpeggio",
+                        info: "This is a **Tonal** arpeggio. It uses notes from a specific scale (C major) and feels stable and predictable."
+                    },
+                    'tonal-melody': {
+                        player: new Tone.Loop(time => {
+                            const notes = ["C4", "D4", "E4", "G4", "F4", "E4", "D4", "C4"];
+                            tonalSynth.triggerAttackRelease(notes[Math.floor(Math.random() * notes.length)], "4n", time);
+                        }, "4n"),
+                        label: "Tonal Melody",
+                        info: "This is a **Tonal** melody. It is based on a clear key, making it feel harmonious and cohesive."
+                    },
+                    'atonal-cluster': {
+                        player: new Tone.Loop(time => {
+                            const notes = ["C4", "C#4", "D4", "D#4"];
+                            atonalSynth.triggerAttackRelease(notes[Math.floor(Math.random() * notes.length)], "4n", time);
+                        }, "4n"),
+                        label: "Atonal Cluster",
+                        info: "This is an **Atonal** cluster. The notes are right next to each other, creating intentional dissonance and tension."
+                    },
+                    'atonal-chromatic': {
+                        player: new Tone.Loop(time => {
+                            const notes = ["C4", "C#4", "D4", "D#4", "E4", "F4", "F#4", "G4", "G#4", "A4", "A#4", "B4"];
+                            atonalSynth.triggerAttackRelease(notes[Math.floor(Math.random() * notes.length)], "8n", time);
+                        }, "8n"),
+                        label: "Atonal Chromatic",
+                        info: "This is an **Atonal** sound. It uses all twelve notes of the chromatic scale, which prevents it from having a clear key or 'home base'."
+                    }
+                };
+            }
+
+            // Initialize sounds on load
+            initializeSounds();
+
+            // Drag and drop event listeners
+            soundIcons.forEach(icon => {
+                icon.addEventListener('dragstart', event => {
+                    event.dataTransfer.setData('text/plain', event.target.dataset.soundId);
+                });
+            });
+
+            dropSlots.forEach(slot => {
+                slot.addEventListener('dragover', event => {
+                    event.preventDefault();
+                    if (!occupiedSlots.has(slot.id)) {
+                        slot.classList.add('active');
+                    }
+                });
+                
+                slot.addEventListener('dragleave', event => {
+                    slot.classList.remove('active');
+                });
+
+                slot.addEventListener('drop', async event => {
+                    event.preventDefault();
+                    slot.classList.remove('active');
+                    const soundId = event.dataTransfer.getData('text/plain');
+                    
+                    if (sounds[soundId] && !occupiedSlots.has(slot.id)) {
+                        // Start audio context on first drop
+                        await Tone.start();
+                        Tone.Transport.start();
+
+                        const sound = sounds[soundId];
+                        
+                        sound.player.loop = true;
+                        sound.player.start(0);
+                        activeSounds[slot.id] = sound.player;
+                        
+                        // Display info
+                        infoPanel.innerHTML = sound.info;
+                        
+                        // Add the icon to the drop zone
+                        const iconClone = document.getElementById(soundId).cloneNode(true);
+                        iconClone.classList.remove('hover:scale-105', 'sound-icon', 'text-sm', 'font-semibold', 'text-white');
+                        iconClone.classList.add('sound-icon-in-slot'); // Add a class for specific styling
+                        iconClone.style.margin = '0';
+                        iconClone.style.transform = 'none';
+                        iconClone.style.boxShadow = 'none';
+                        iconClone.draggable = false;
+                        
+                        // Clear the slot and append the new icon
+                        while (slot.firstChild) {
+                            slot.removeChild(slot.firstChild);
+                        }
+                        slot.appendChild(iconClone);
+                        occupiedSlots.add(slot.id);
+
+                        // Add click listener to remove sound
+                        slot.addEventListener('click', () => {
+                            stopSound(slot.id);
+                        }, { once: true });
+                    }
+                });
+            });
+            
+            // Stop sound functionality
+            function stopSound(slotId) {
+                if (activeSounds[slotId]) {
+                    activeSounds[slotId].stop();
+                    delete activeSounds[slotId];
+                    occupiedSlots.delete(slotId);
+                    
+                    const slot = document.getElementById(slotId);
+                    while (slot.firstChild) {
+                        slot.removeChild(slot.firstChild);
+                    }
+                    slot.innerHTML = '';
+                    
+                    // Reset info panel if all sounds are removed
+                    if (Object.keys(activeSounds).length === 0) {
+                        infoPanel.innerHTML = initialInfoContent;
+                    }
+                }
+            }
+
+            function resetMixer() {
+                // Stop all players
+                for (const soundId in sounds) {
+                    sounds[soundId].player.stop();
+                }
+
+                // Clear the active sounds and occupied slots
+                Object.keys(activeSounds).forEach(key => delete activeSounds[key]);
+                occupiedSlots.clear();
+
+                // Clear the drop zones
+                dropSlots.forEach(slot => {
+                    while (slot.firstChild) {
+                        slot.removeChild(slot.firstChild);
+                    }
+                    slot.classList.remove('active');
+                });
+                
+                // Re-initialize sound objects to ensure they are new and can be started again
+                initializeSounds();
+                
+                // Reset the info panel
+                infoPanel.innerHTML = initialInfoContent;
+            }
+
+            resetButton.addEventListener('click', resetMixer);
+
+            window.addEventListener('beforeunload', () => {
+                Tone.Transport.stop();
+                for (const id in activeSounds) {
+                    activeSounds[id].stop();
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
