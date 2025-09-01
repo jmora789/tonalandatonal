@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tonal and Atonal</title>
+    <title>Harmonic Mixer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -58,7 +58,6 @@
                 Drag a sound icon from the palettes and drop it into an available slot in the central mixer. Listen to how they interact.
             </p>
             <div id="info-panel" class="text-black p-4 rounded-xl text-sm" style="background-color: #e1f8f3;">
-                <p><strong>Get started:</strong> Drag a sound icon from the palettes and drop it into the mixer to begin.</p>
                 <p class="mt-2 text-base"><strong>Tonal Music:</strong> Has a clear home key and a sense of resolution.</p>
                 <p class="text-base"><strong>Atonal Music:</strong> Avoids a key, creating a sense of tension or unpredictability.</p>
             </div>
@@ -118,7 +117,6 @@
             let sounds = {}; // The sounds object will be re-created on reset.
 
             const initialInfoContent = `
-                <p><strong>Get started:</strong> Drag a sound icon from the palettes and drop it into the mixer to begin.</p>
                 <p class="mt-2 text-base"><strong>Tonal Music:</strong> Has a clear home key and a sense of resolution.</p>
                 <p class="text-base"><strong>Atonal Music:</strong> Avoids a key, creating a sense of tension or unpredictability.</p>
             `;
