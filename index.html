@@ -8,7 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300&family=Oswald:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400&family=Oswald:wght@500&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Barlow', sans-serif;
@@ -19,12 +19,7 @@
             -ms-user-select: none;     /* IE10+/Edge */
             user-select: none;         /* Standard */
         }
-        h1, h2 {
-            font-family: Arial, sans-serif;
-            font-weight: bold;
-            font-size: 16pt;
-            text-transform: none;
-        }
+        /* Removed custom h1, h2 styles as Tailwind will handle them */
         .drop-area {
             border: 2px dashed #a0aec0;
             transition: all 0.2s;
@@ -50,56 +45,61 @@
 </head>
 <body class="bg-gray-50 flex flex-col items-center justify-center min-h-screen p-4">
 
-    <main class="w-full max-w-4xl p-8 bg-white rounded-2xl shadow-xl flex flex-col md:flex-row items-center justify-between space-y-8 md:space-y-0 md:space-x-8">
+    <main class="w-full max-w-4xl p-8 bg-white rounded-2xl shadow-xl flex flex-col items-center space-y-8">
         
-        <div class="md:w-1/3 w-full space-y-4">
-            <h1 class="text-xl font-bold text-center md:text-left" style="font-family: Oswald, sans-serif; color: #e91d63;">The Harmonic Mixer</h1>
-            <p class="text-center md:text-left">
+        <div class="w-full text-center space-y-4">
+            <h1 class="text-3xl md:text-4xl font-bold font-['Oswald'] text-[#e91d63]">The Harmonic Mixer</h1>
+            <p class="text-base md:text-lg">
                 Drag a sound icon from the palettes and drop it into an available slot in the central mixer. Listen to how they interact.
             </p>
-            <div id="info-panel" class="text-black p-4 rounded-xl text-sm" style="background-color: #e1f8f3;">
-                <p class="mt-2 text-base"><strong>Tonal Music:</strong> Has a clear home key and a sense of resolution.</p>
-                <p class="text-base"><strong>Atonal Music:</strong> Avoids a key, creating a sense of tension or unpredictability.</p>
-            </div>
-            <button id="reset-button" class="w-full py-2 px-4 rounded-lg text-white font-semibold text-sm transform hover:scale-105 transition-transform duration-200" style="background-color: #e91d63;">
-                Reset Mixer
-            </button>
-            <a href="https://www.jennifermora.com/portfolio" target="_blank" class="w-full py-2 px-4 rounded-lg text-white font-semibold text-sm transform hover:scale-105 transition-transform duration-200" style="background-color: #e91d63; text-align: center; display: block;">
-                Return to Portfolio
-            </a>
         </div>
 
-        <div id="mixer" class="md:w-1/3 w-full flex items-center justify-center">
-            <div class="w-64 h-64 rounded-full flex flex-wrap items-center justify-center gap-2 bg-gray-100 p-4">
-                <div id="slot-1" class="drop-area w-24 h-24 rounded-full flex items-center justify-center"></div>
-                <div id="slot-2" class="drop-area w-24 h-24 rounded-full flex items-center justify-center"></div>
-                <div id="slot-3" class="drop-area w-24 h-24 rounded-full flex items-center justify-center"></div>
-                <div id="slot-4" class="drop-area w-24 h-24 rounded-full flex items-center justify-center"></div>
+        <div class="w-full flex flex-col md:flex-row items-start justify-between space-y-8 md:space-y-0 md:space-x-8">
+            <div class="md:w-1/3 w-full space-y-4">
+                <div id="info-panel" class="text-black p-4 rounded-xl text-base" style="background-color: #e1f8f3;">
+                    <p class="mt-2"><strong>Tonal Music:</strong> Has a clear home key and a sense of resolution.</p>
+                    <p><strong>Atonal Music:</strong> Avoids a key, creating a sense of tension or unpredictability.</p>
+                </div>
+                <button id="reset-button" class="w-full py-2 px-4 rounded-lg text-white font-semibold text-sm transform hover:scale-105 transition-transform duration-200" style="background-color: #e91d63;">
+                    Reset Mixer
+                </button>
+                <a href="https://www.jennifermora.com/portfolio" target="_blank" class="w-full py-2 px-4 rounded-lg text-white font-semibold text-sm transform hover:scale-105 transition-transform duration-200" style="background-color: #e91d63; text-align: center; display: block;">
+                    Return to Portfolio
+                </a>
             </div>
-        </div>
 
-        <div class="md:w-1/3 w-full flex flex-row md:flex-col items-center justify-between md:space-y-6">
-            
-            <div class="flex-1 w-full flex flex-col items-center space-y-4">
-                <h2 class="font-bold text-sm text-center text-black uppercase" style="font-family: 'Oswald', sans-serif;">Tonal Sounds</h2>
-                <div class="flex flex-col space-y-4">
-                    <div id="tonal-arpeggio" class="sound-icon w-20 h-20 rounded-full flex items-center justify-center shadow-lg text-white font-semibold text-xs transform hover:scale-105 transition-transform duration-200" style="background-color: #1de9c1;" draggable="true" data-sound-id="tonal-arpeggio">
-                        Arpeggio
-                    </div>
-                    <div id="tonal-melody" class="sound-icon w-20 h-20 rounded-full flex items-center justify-center shadow-lg text-white font-semibold text-xs transform hover:scale-105 transition-transform duration-200" style="background-color: #1de9c1;" draggable="true" data-sound-id="tonal-melody">
-                        Melody
-                    </div>
+            <div id="mixer" class="md:w-1/3 w-full flex items-center justify-center">
+                <div class="w-64 h-64 rounded-full flex flex-wrap items-center justify-center gap-2 bg-gray-100 p-4">
+                    <div id="slot-1" class="drop-area w-24 h-24 rounded-full flex items-center justify-center"></div>
+                    <div id="slot-2" class="drop-area w-24 h-24 rounded-full flex items-center justify-center"></div>
+                    <div id="slot-3" class="drop-area w-24 h-24 rounded-full flex items-center justify-center"></div>
+                    <div id="slot-4" class="drop-area w-24 h-24 rounded-full flex items-center justify-center"></div>
                 </div>
             </div>
-            
-            <div class="flex-1 w-full flex flex-col items-center space-y-4 md:mt-0">
-                <h2 class="font-bold text-sm text-center text-black uppercase" style="font-family: 'Oswald', sans-serif;">Atonal Sounds</h2>
-                <div class="flex flex-col space-y-4">
-                    <div id="atonal-cluster" class="sound-icon w-20 h-20 rounded-full flex items-center justify-center shadow-lg text-white font-semibold text-xs transform hover:scale-105 transition-transform duration-200" style="background-color: #e91d63;" draggable="true" data-sound-id="atonal-cluster">
-                        Cluster
+
+            <div class="md:w-1/3 w-full flex flex-row md:flex-col items-center justify-between md:space-y-6">
+                
+                <div class="flex-1 w-full flex flex-col items-center space-y-4">
+                    <h2 class="font-bold text-sm text-center text-black uppercase font-['Oswald']">Tonal Sounds</h2>
+                    <div class="flex flex-col space-y-4">
+                        <div id="tonal-arpeggio" class="sound-icon w-20 h-20 rounded-full flex items-center justify-center shadow-lg text-white font-semibold text-xs transform hover:scale-105 transition-transform duration-200" style="background-color: #1de9c1;" draggable="true" data-sound-id="tonal-arpeggio">
+                            Arpeggio
+                        </div>
+                        <div id="tonal-melody" class="sound-icon w-20 h-20 rounded-full flex items-center justify-center shadow-lg text-white font-semibold text-xs transform hover:scale-105 transition-transform duration-200" style="background-color: #1de9c1;" draggable="true" data-sound-id="tonal-melody">
+                            Melody
+                        </div>
                     </div>
-                    <div id="atonal-chromatic" class="sound-icon w-20 h-20 rounded-full flex items-center justify-center shadow-lg text-white font-semibold text-xs transform hover:scale-105 transition-transform duration-200" style="background-color: #e91d63;" draggable="true" data-sound-id="atonal-chromatic">
-                        Chromatic
+                </div>
+                
+                <div class="flex-1 w-full flex flex-col items-center space-y-4 md:mt-0">
+                    <h2 class="font-bold text-sm text-center text-black uppercase font-['Oswald']">Atonal Sounds</h2>
+                    <div class="flex flex-col space-y-4">
+                        <div id="atonal-cluster" class="sound-icon w-20 h-20 rounded-full flex items-center justify-center shadow-lg text-white font-semibold text-xs transform hover:scale-105 transition-transform duration-200" style="background-color: #e91d63;" draggable="true" data-sound-id="atonal-cluster">
+                            Cluster
+                        </div>
+                        <div id="atonal-chromatic" class="sound-icon w-20 h-20 rounded-full flex items-center justify-center shadow-lg text-white font-semibold text-xs transform hover:scale-105 transition-transform duration-200" style="background-color: #e91d63;" draggable="true" data-sound-id="atonal-chromatic">
+                            Chromatic
+                        </div>
                     </div>
                 </div>
             </div>
@@ -117,8 +117,8 @@
             let sounds = {}; // The sounds object will be re-created on reset.
 
             const initialInfoContent = `
-                <p class="mt-2 text-base"><strong>Tonal Music:</strong> Has a clear home key and a sense of resolution.</p>
-                <p class="text-base"><strong>Atonal Music:</strong> Avoids a key, creating a sense of tension or unpredictability.</p>
+                <p class="mt-2"><strong>Tonal Music:</strong> Has a clear home key and a sense of resolution.</p>
+                <p><strong>Atonal Music:</strong> Avoids a key, creating a sense of tension or unpredictability.</p>
             `;
             
             // Initialize Tone.js instruments and a main volume control
